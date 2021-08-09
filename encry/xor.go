@@ -1,4 +1,4 @@
-package main
+package encry
 
 import (
 	"strconv"
@@ -10,8 +10,8 @@ type Xor struct {
 }
 
 type m interface {
-	enc(src string) string
-	dec(src string) string
+	e(src string) string
+	d(src string) string
 }
 
 func (a *Xor) e(src string) string {
@@ -30,7 +30,7 @@ func (a *Xor) e(src string) string {
 	return result
 }
 
-func (a *Xor) d(src string) string {
+func (a *Xor) D(src string) string {
 	var result string
 	var s int64
 	j := 0

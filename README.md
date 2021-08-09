@@ -7,4 +7,13 @@
 
 ## 思路
 
+## 命令
 
+```bash
+
+go build -ldflags="-s -w" -o main1.exe -race main.go
+
+go build -ldflags="-s -w" -o main1.exe
+go build -ldflags="-s -w -H=windowsgui" -o main2.exe
+
+```
