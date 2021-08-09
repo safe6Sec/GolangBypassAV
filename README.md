@@ -11,9 +11,13 @@
 
 ```bash
 
+效果一般
 go build -ldflags="-s -w" -o main1.exe -race main.go
 
+效果还可以
 go build -ldflags="-s -w" -o main1.exe
+
+效果还可以
 go build -ldflags="-s -w -H=windowsgui" -o main2.exe
 
 ```
