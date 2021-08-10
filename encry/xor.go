@@ -4,17 +4,9 @@ import (
 	"strconv"
 )
 
-var XorKey []byte = []byte{0x12, 0x34, 0x67, 0x6A, 0xA1, 0xFF, 0x04, 0x7B}
+var XorKey = []byte{0x12, 0x34, 0x67, 0x6A, 0xA1, 0xFF, 0x04, 0x7B}
 
-type Xor struct {
-}
-
-type m interface {
-	e(src string) string
-	d(src string) string
-}
-
-func (a *Xor) e(src string) string {
+func E(src string) string {
 	var result string
 	j := 0
 	s := ""
@@ -30,7 +22,7 @@ func (a *Xor) e(src string) string {
 	return result
 }
 
-func (a *Xor) D(src string) string {
+func D(src string) string {
 	var result string
 	var s int64
 	j := 0
@@ -41,4 +33,22 @@ func (a *Xor) D(src string) string {
 		j = (j + 1) % 8
 	}
 	return result
+}
+
+func DD(src string) string {
+	xor_shellcode := []byte(src)
+	var shellcode []byte
+	for i := 0; i < len(xor_shellcode); i++ {
+		shellcode = append(shellcode, xor_shellcode[i]^XorKey[1]^XorKey[2])
+	}
+	return string(shellcode)
+}
+
+func EE(src string) string {
+	shellcode := []byte(src)
+	var xor_shellcode []byte
+	for i := 0; i < len(shellcode); i++ {
+		xor_shellcode = append(xor_shellcode, shellcode[i]^XorKey[2]^XorKey[1])
+	}
+	return string(xor_shellcode)
 }

