@@ -6,18 +6,26 @@
 
 
 ## 思路
+静态免杀比较简单，可选加密payload或者分离payload。  
+分离免杀效果比加密payload的效果要好。
 
-## 命令
+## 目录介绍
+- hello  
+golang的demo。hello world 也有5个报毒。
+  
+- test1  
+随手抄了一个加密payload出来。效果一般。
+
+
+
+## 编译命令
 
 ```bash
 
-效果一般
 go build -ldflags="-s -w" -o main1.exe -race main.go
 
-效果还可以
 go build -ldflags="-s -w" -o main1.exe
 
-效果还可以
 go build -ldflags="-s -w -H=windowsgui" -o main2.exe
 
 ```
