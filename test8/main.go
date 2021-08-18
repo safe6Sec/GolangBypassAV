@@ -41,8 +41,8 @@ func getEnCode(data []byte) string {
 }
 
 var (
-	kernel32 = syscall.MustLoadDLL("kernel32.dll")
-	ntdll    = syscall.MustLoadDLL("ntdll.dll")
+	//kernel32 = syscall.MustLoadDLL("kernel32.dll")
+	ntdll = syscall.MustLoadDLL("ntdll.dll")
 	//VirtualAlloc  = kernel32.MustFindProc("VirtualAlloc")
 	DllTestDef, _ = syscall.LoadLibrary("kernel32.dll")
 	RtlCopyMemory = ntdll.MustFindProc("RtlCopyMemory")
