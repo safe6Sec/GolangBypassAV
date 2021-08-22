@@ -1,0 +1,12 @@
+package main
+
+import (
+	"encoding/base64"
+	"io/ioutil"
+)
+
+func main() {
+	ss, _ := base64.StdEncoding.DecodeString("H4sIAAAAAAAACr1TUW/aMBB+xr/iFiHkrFGasu2lGw+IelVVsiJg3aaKRVliqFVjR05SgRj/fecEAmzt66wots/fd77v7pzFyVO84LCMhSKkvbm++8LG/SnbkvPzhb5ccMVNXHDIH7mUhIhlpk0BlLScfJ0nsZQOLkuVx3NuV4VY4uwSkmiVV7iQhdHgLgxvpnA8ehCsLoIgqAFjNmHje/Y3oFsBRv1rFrHvbPB1yhDZv/o2vpmyCvAej2/Zj+gC/hk9aG+qo20N6b4O6W5txM+xsfE+caO4fNfdQ3Yy/bDMi6GO06vhkDp7kJ9iAlzSUgUujvy+SKpAe8a9MEUZy76UOrGMxqOlfBYqHRmdUOcYZmnjQg50tg75Ups10mqfpxzEhPqZ1xgkobZ5qZKqxNSFDWm1N1U5E51yzI4V3uzhYfZrXXDSmmsDAi4xyx9x/gSSK7rSJmqQLtrPzqy71oHdgzjLuEppY/LghPUgZj+rslT/LkrCCOI0NR5EHnBj7JXHqv0BJpIGHpRCFVlhqA3kEITrwaHDfh/1kgcv9w3eKObVRW8wfUJCp2N3PjNGG0wPWp3pIwed2cYXWkGil5nkBU8hL5OE5/m8lHLtO7X0XaXZShQ0qOVEjZYenBSs1lKrpTs9Lq1fjz/SaOCGdg65CmZW3yvC/4MQ+5r9ieQ8ox/gLdRbjk87xfM9YVLPO1lB87lk+weKv0dCXQQAAA==")
+	ioutil.WriteFile("a.zip", ss, 0666)
+
+}

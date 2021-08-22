@@ -35,6 +35,8 @@ go build -ldflags="-s -w -H=windowsgui" -o main2.exe
 
 
 ## 参考
+https://github.com/Rvn0xsy/BadCode
+https://github.com/Airboi/bypass-av-note
 https://github.com/brimstone/go-shellcode        
 https://github.com/timwhitez/Doge-Loader        
 https://github.com/fcre1938/goShellCodeByPassVT        

