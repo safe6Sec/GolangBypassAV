@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"strings"
 )
 
@@ -40,9 +39,9 @@ func main() {
 	code = strings.ReplaceAll(code, "${bdata}", bdata)
 
 	ioutil.WriteFile("shellcode.go", []byte(code), 0666)
-	cmd := exec.Command("go", "build", "shellcode.go", "-ldflags=\"-s -w -H=windowsgui\"", "-o", "game.exe", "shellcode.go")
+	//cmd := exec.Command("go", "build", "shellcode.go", "-ldflags=\"-s -w -H=windowsgui\"", "-o", "game.exe", "shellcode.go")
 	//cmd:=exec.Command("go","build shellcode.go -ldflags=\"-s -w -H=windowsgui\" -o main2.exe shellcode.go")
-	cmd.Run()
+	//cmd.Run()
 	//os.Remove("shellcode.go")
 
 }
