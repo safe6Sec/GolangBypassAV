@@ -9,6 +9,7 @@ import (
 	"unsafe"
 )
 
+//直接抄过来的，还未改造
 type PROCESSENTRY32 struct {
 	dwSize              uint32
 	cntUsage            uint32
