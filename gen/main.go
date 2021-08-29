@@ -36,7 +36,7 @@ func init() {
 	gd = randString(6)
 
 	//base64变量
-	bbdataName = randString(2)
+	bbdataName = randString(1)
 
 	shellCodeHex = randString(4)
 }

