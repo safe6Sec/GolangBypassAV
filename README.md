@@ -60,16 +60,22 @@ main.exe
 
 ## 编译命令
 
-```bash
 
+```bash
+免杀效果最好,缺点文件最大
+go build main.go
+
+加了race参数,文件更大比原始的还大,效果很垃圾
 go build -ldflags="-s -w" -o main1.exe -race main.go
 
+常用编译命令,免杀效果较好,可以减少文件体积
 go build -ldflags="-s -w" -o main1.exe
 
+常用编译命令,免杀效果一般,减少文件体积+隐藏窗口
 go build -ldflags="-s -w -H=windowsgui" -o main2.exe
 
-set GOOS=windows GOARCH=amd64;go build -o main.exe
 
+set GOOS=windows GOARCH=amd64;go build -o main.exe
 
 ```
 
