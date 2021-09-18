@@ -1,6 +1,9 @@
 # GolangBypassAV
-研究利用golang来bypassAV
 
+
+![GolangBypassAV](https://socialify.git.ci/safe6Sec/GolangBypassAV/image?description=1&font=Inter&forks=1&issues=1&language=1&owner=1&pattern=Plus&stargazers=1&theme=Light)
+
+研究利用golang来bypassAV
 ## 前言
 免杀这块本来就不是web狗擅长的，而且作为一个web狗也没必要花太多时间来折腾这个，达到能用就行，不要追求全部免杀，能免杀目标就行。
 
@@ -16,8 +19,7 @@
 把payload隐写到图片     
 总之就是各种分离  
 
-### 动态
-golang和c++有点不一样不需要考虑处理IAT。    
+### 动态   
 敏感api越少越好比如注册表操作、添加启动项、添加服务、添加用户、注入、劫持、创建进程、加载DLL等等    
 核心：   
 想法设法的把shellcode加载到内存里面。    
@@ -26,7 +28,7 @@ golang和c++有点不一样不需要考虑处理IAT。
 
 
 ## 使用
-**只支持windows系统!!!!**
+**暂时只支持windows系统编译!!!!**
 
 默认payload位置C:\\Users\\Administrator\\Desktop\\payload.bin  
 执行下面命令,即可生成免杀(game.exe)
