@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package main
@@ -307,7 +308,7 @@ func main() {
 		OEMID    uint16     // USHORT OEM identifier (for e_oeminfo)
 		OEMInfo  uint16     // USHORT OEM information; e_oemid specific
 		Res2     [10]uint16 // USHORT Reserved words
-		LfaNew   int32      // LONG File address of new exe header
+		LfaNew   int32      // LONG File address of bypass exe header
 	}
 
 	if *debug {

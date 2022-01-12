@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 // Concept pulled from https://www.cyberbit.com/blog/endpoint-security/new-early-bird-code-injection-technique-discovered/

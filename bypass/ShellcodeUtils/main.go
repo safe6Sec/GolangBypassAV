@@ -26,12 +26,13 @@ func main() {
 	verbose := flag.Bool("v", false, "Enable verbose output")
 	encryptionType := flag.String("type", "", "The type of encryption to use [xor, aes256, rc4, null]")
 	key := flag.String("key", "", "Encryption key")
-	b64 := flag.Bool("base64", false, "Base64 encode the output. Can be used with or without encryption")
-	input := flag.String("i", "", "Input file path of binary file")
-	output := flag.String("o", "", "Output file path")
+	b64 := flag.Bool("base64", true, "Base64 encode the output. Can be used with or without encryption")
+	input := flag.String("i", "./payload.bin", "Input file path of binary file")
+	output := flag.String("o", "./payload.txt", "Output file path")
 	mode := flag.String("mode", "encrypt", "Mode of operation to perform on the input file [encrypt,decrypt]")
 	salt := flag.String("salt", "", "Salt, in hex, used to generate an AES256 32-byte key through Argon2. Only used during decryption")
 	inputNonce := flag.String("nonce", "", "Nonce, in hex, used to decrypt an AES256 input file. Only used during decryption")
+
 	flag.Usage = func() {
 		flag.PrintDefaults()
 		os.Exit(0)
@@ -109,6 +110,16 @@ func main() {
 			for k, v := range shellcode {
 				encryptedBytes[k] = v ^ tempKey[k%len(tempKey)]
 			}
+			//输出解密代码
+			/*			color.Green(fmt.Sprintf(`[+] print decrypting code.
+			b64:=
+																	decryptedBytes := make([]byte, len(shellcode))
+																	tempKey := *key
+																	for k, v := range shellcode {
+																		decryptedBytes[k] = v ^ tempKey[k%len(tempKey)]
+																	}
+
+															`, shellcode,))*/
 		case "AES256":
 			// https://github.com/gtank/cryptopasta/blob/master/encrypt.go
 			if *verbose {
@@ -255,6 +266,7 @@ func main() {
 			// https://kylewbanks.com/blog/xor-encryption-using-go
 			if *verbose {
 				color.Yellow(fmt.Sprintf("[-]XOR decrypting input file with key: %s", *key))
+
 			}
 			decryptedBytes = make([]byte, len(shellcode))
 			tempKey := *key

