@@ -1,9 +1,6 @@
 package main
 
-import (
-	"encoding/hex"
-	"fmt"
-)
+import "fmt"
 
 func main() {
 
@@ -16,7 +13,7 @@ func main() {
 	//
 	//fmt.Println("3",c^a)
 
-	var shellcode = []byte{
+	/*var shellcode = []byte{
 		0x31, 0xc0, 0x50, 0x68, 0x63, 0x61, 0x6c, 0x63,
 		0x54, 0x59, 0x50, 0x40, 0x92, 0x74, 0x15, 0x51,
 		0x64, 0x8b, 0x72, 0x2f, 0x8b, 0x76, 0x0c, 0x8b,
@@ -32,8 +29,22 @@ func main() {
 		0xef, 0x8b, 0x74, 0x1f, 0x1c, 0x48, 0x01, 0xfe,
 		0x8b, 0x34, 0xae, 0x48, 0x01, 0xf7, 0x99, 0xff,
 		0xd7,
-	}
+	}*/
 
-	dd := hex.EncodeToString(shellcode)
-	fmt.Println(dd)
+	//dd := hex.EncodeToString(shellcode)
+	//fmt.Println(dd)
+
+	a := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	s1 := a[1:3]
+	fmt.Println("a=", len(a))
+	fmt.Println("s1=", len(s1))
+	s2 := s1[2:5]
+	fmt.Println("s2=", len(s2))
+	s3 := s2[1:6]
+	fmt.Println("s3=", len(s3))
+	fmt.Println("=============")
+	fmt.Println("s3=", s3)
+	a = append(a, 12)
+
+	fmt.Printf("s1=%d\r\ns2=\ns3=%d\r\n%p\r\n%p", s1, s2, s3, &a, &s1)
 }

