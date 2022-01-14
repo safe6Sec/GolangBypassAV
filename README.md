@@ -90,10 +90,10 @@ set GOOS=windows GOARCH=amd64;go build -o main.exe
 
 
 ## 参考
-https://github.com/Ne0nd0g/go-shellcode     
-https://github.com/Rvn0xsy/BadCode    
-github.com/timwhitez/Doge-Gabh      
-https://github.com/Airboi/bypass-av-note    
-https://github.com/brimstone/go-shellcode            
-https://github.com/timwhitez/Doge-Loader            
-https://github.com/fcre1938/goShellCodeByPassVT            
+- https://github.com/Ne0nd0g/go-shellcode     
+- https://github.com/Rvn0xsy/BadCode    
+- https://github.com/timwhitez/Doge-Gabh    
+- https://github.com/Airboi/bypass-av-note    
+- https://github.com/brimstone/go-shellcode            
+- https://github.com/timwhitez/Doge-Loader            
+- https://github.com/fcre1938/goShellCodeByPassVT            
